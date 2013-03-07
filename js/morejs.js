@@ -109,6 +109,8 @@ function getFromDatabase() {
           data[i]['wpc'] = "<span class='muted'>-NGP-</span>";
         } else {
           data[i]['wpc'] = (parseFloat(data[i].wins)/(parseFloat(data[i].wins)+parseFloat(data[i].losses))).toFixed(3);
+          data[i]['losses'] = data[i].losses;
+          data[i]['wins'] = data[i].wins;
         }
       }
 
@@ -121,7 +123,12 @@ function getFromDatabase() {
       populateTeamList(data);
       displayButton(data.length);
 
-      // League Standings      
+      // League Standings
+      // Sort by wins
+      data.sort(sort_by('wins', true, parseFloat)); 
+      // then by losses first
+      data.sort(sort_by('losses', false, parseFloat));      
+      // then by win percentage
       data.sort(sort_by('wpc', true, parseFloat));
       track("<i class='icon-random'></i> Teams sorted");
       populateTeamTable(data);
@@ -374,38 +381,60 @@ function logGameOutcome() {
     homeTeamScore: $("#inputHomeTeamScore").val(),
     awayTeamScore: $("#inputAwayTeamScore").val(),
   };
-  $.ajax({
-    url: 'backliftapp/outcomes',
-    type: "POST",
-    dataType: "json",
-    data: gameOutcome,
-    success: function (data) {
-      
-      //this is the bit that assigns wins and losses
-      if (parseFloat(gameOutcome.homeTeamScore) > parseFloat(gameOutcome.awayTeamScore)) {
-        increment(gameOutcome.homeTeamId, "wins", "1");
-        increment(gameOutcome.awayTeamId, "losses", "1");
-      } else if (parseFloat(gameOutcome.homeTeamScore) < parseFloat(gameOutcome.awayTeamScore)) {
-        increment(gameOutcome.homeTeamId, "losses", "1");
-        increment(gameOutcome.awayTeamId, "wins", "1");
-      } else if (parseFloat(gameOutcome.homeTeamScore) === parseFloat(gameOutcome.awayTeamScore)) {
-        increment(gameOutcome.homeTeamId, "wins", ".5");
-        increment(gameOutcome.homeTeamId, "losses", ".5");
-        increment(gameOutcome.awayTeamId, "wins", ".5");
-        increment(gameOutcome.awayTeamId, "losses", ".5");   
-      }
 
-      // Clear Imput Fields
-      $("#inputHomeTeamScore").val("");
-      $("#inputAwayTeamScore").val("");
+  if (parseFloat(gameOutcome.homeTeamScore) === parseFloat(gameOutcome.awayTeamScore)) {
+    alert("Ties are not an option, please enter scores again");
 
-      // wait a bit then refresh the page. Give a sec to allow the kids to finish.
-      window.setTimeout(function() {
-        getFromDatabase();
-      }, 250); // time in miliseconds
+    // Clear Imput Fields
+    $("#inputHomeTeamScore").val("");
+    $("#inputAwayTeamScore").val("");
 
-    }
-  }); // end ajax
+    // wait a bit then refresh the page. Give a sec to allow the kids to finish.
+    window.setTimeout(function() {
+      getFromDatabase();
+    }, 250); // time in miliseconds
+
+  } else if (parseFloat(gameOutcome.homeTeamScore) < 0 || parseFloat(gameOutcome.awayTeamScore) < 0) {
+    alert("Negative scores are not an option, please enter scores again");
+
+    // Clear Imput Fields
+    $("#inputHomeTeamScore").val("");
+    $("#inputAwayTeamScore").val("");
+
+    // wait a bit then refresh the page. Give a sec to allow the kids to finish.
+    window.setTimeout(function() {
+      getFromDatabase();
+    }, 250); // time in miliseconds
+
+  } else {
+      $.ajax({
+        url: 'backliftapp/outcomes',
+        type: "POST",
+        dataType: "json",
+        data: gameOutcome,
+        success: function (data) {
+          
+          //this is the bit that assigns wins and losses
+          if (parseFloat(gameOutcome.homeTeamScore) > parseFloat(gameOutcome.awayTeamScore)) {
+            increment(gameOutcome.homeTeamId, "wins", "1");
+            increment(gameOutcome.awayTeamId, "losses", "1");
+          } else if (parseFloat(gameOutcome.homeTeamScore) < parseFloat(gameOutcome.awayTeamScore)) {
+            increment(gameOutcome.homeTeamId, "losses", "1");
+            increment(gameOutcome.awayTeamId, "wins", "1");
+          } 
+
+          // Clear Imput Fields
+          $("#inputHomeTeamScore").val("");
+          $("#inputAwayTeamScore").val("");
+
+          // wait a bit then refresh the page. Give a sec to allow the kids to finish.
+          window.setTimeout(function() {
+            getFromDatabase();
+          }, 250); // time in miliseconds
+
+        }
+      }); // end ajax
+    }; // end else
 }; // end log game outcome
 
 
