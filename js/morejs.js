@@ -14,7 +14,8 @@ var validator = $("#signupForm").validate({
         mgrLast : "required",
         mgrPhone : {
               required : true,
-              minlength : 12
+              minlength : 12,
+              maxlength : 12
           },
         email : "required",
         zip: {
@@ -37,10 +38,11 @@ var validator = $("#signupForm").validate({
 }); //end validate
 
 $("#addTeam").click(function(){
-    if($('#signupForm').valid() == true){
-  addTeam();
-  $("#myModal").modal('hide');
-}
+  if($('#signupForm').valid() == true){
+    addTeam();
+    $("#myModal").modal('hide');
+  }
+  
 return false;
 
 }); //end click

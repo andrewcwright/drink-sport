@@ -27,4 +27,9 @@ Phases 1 and 2:
   the addition of new teams).
 - Adding scores calculates winning percentage for the teams and updates/sorts the league list with a table of 
   each team's wins and losses and winning percentage. The team with the highest winning percentage is listed first.
-  The scores also appear in the schedule table in place of the scheduled game time. 
+  The scores also appear in the schedule table in place of the scheduled game time.
+
+
+3/11/2013
+- Added code to prevent ties or negative numbers. Changed html to reflect this.
+- Fixed multiple sorting bugs. Changed default values of teams with no scores logged to an integer instead of an html string. Also sorted by wins, losses, then percentage. This fixed a bug which sorted teams with different numbers of losses but identical percentages incorrectly.
