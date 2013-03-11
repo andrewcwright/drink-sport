@@ -106,11 +106,9 @@ function getFromDatabase() {
         data[i]['scheduleId'] = i + 1;
         // fix for NAN in win Percent Calculation
         if (data[i].wins === "0" && data[i].losses === "0") {
-          data[i]['wpc'] = "<span class='muted'>-NGP-</span>";
+          data[i]['wpc'] = parseFloat(0.000).toFixed(3).replace(/^0+/, '');
         } else {
-          data[i]['wpc'] = (parseFloat(data[i].wins)/(parseFloat(data[i].wins)+parseFloat(data[i].losses))).toFixed(3);
-          data[i]['losses'] = data[i].losses;
-          data[i]['wins'] = data[i].wins;
+          data[i]['wpc'] = (parseFloat(data[i].wins)/(parseFloat(data[i].wins)+parseFloat(data[i].losses))).toFixed(3).replace(/^0+/, '');
         }
       }
 
